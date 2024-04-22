@@ -40,7 +40,6 @@ import tensorflow.compat.v1 as tf
 from tensorflow.compat.v1 import estimator as tf_estimator
 
 
-from tensorflow.contrib import data as contrib_data
 from tensorflow.contrib import layers as contrib_layers
 
 DATA_DIR = os.getenv("CAPWAP_DATA", "data")
@@ -411,18 +410,20 @@ def input_fn_builder(input_file, seq_length, is_training, drop_remainder):
     # For eval, we want no shuffling and parallel reading doesn't matter.
     d = tf.data.Dataset.list_files(input_file, shuffle=False)
     d = d.apply(
-        contrib_data.parallel_interleave(
+        tf.data.experimental.parallel_interleave(
             functools.partial(
-                tf.data.TFRecordDataset,
-                compression_type=FLAGS.compression_type),
+                tf.data.TFRecordDataset, compression_type=FLAGS.compression_type
+            ),
             cycle_length=32,
-            sloppy=is_training))
+            sloppy=is_training,
+        )
+    )
     if is_training:
       d = d.repeat()
       d = d.shuffle(buffer_size=100)
 
     d = d.apply(
-        contrib_data.map_and_batch(
+        tf.data.experimental.map_and_batch(
             lambda record: _decode_record(record, name_to_features),
             batch_size=batch_size,
             drop_remainder=drop_remainder))

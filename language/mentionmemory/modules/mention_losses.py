@@ -291,7 +291,7 @@ def coreference_resolution_loss(
             jnp.dot(weights_per_sample, (1 - mention_target_is_masked)),
     }
 
-  return loss, final_metrics
+  return loss, final_metrics  # pytype: disable=bad-return-type  # jnp-type
 
 
 def mtb_loss(
@@ -417,7 +417,7 @@ def mtb_loss(
         'denominator':
             jnp.dot(weights_per_sample, (1 - mention_target_is_masked)),
     }
-  return loss, final_metrics
+  return loss, final_metrics  # pytype: disable=bad-return-type  # jnp-type
 
 
 def entity_linking_loss(mention_encodings: Array, entity_embeddings: Array,
@@ -481,7 +481,7 @@ def entity_linking_loss(mention_encodings: Array, entity_embeddings: Array,
       'cos_sim': cos_per_mention.sum(),
       'denominator': mention_target_weights.sum()
   }
-  return loss, metrics, (acc_per_mention, mention_target_weights)
+  return loss, metrics, (acc_per_mention, mention_target_weights)  # pytype: disable=bad-return-type  # jax-ndarray
 
 
 def get_batch_and_retrievals_entity_overlap(
